@@ -70,7 +70,8 @@ type PropsType = {
   selection: Array<Date>
   selectionScheme: SelectionSchemeType
   onChange: (newSelection: Array<Date>) => void
-  startDate: Date
+  //startDate: Date
+  renderingDates: Date[] // 이선호 추가
   numDays: number
   minTime: number
   maxTime: number
@@ -120,7 +121,9 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     minTime: 9,
     maxTime: 23,
     hourlyChunks: 1,
-    startDate: new Date(),
+    // startDate: new Date(),
+    // 이선호 추가
+    renderingDates: [],
     timeFormat: 'ha',
     dateFormat: 'M/D',
     columnGap: '4px',
@@ -142,6 +145,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     return null
   }
 
+  /* 
   static computeDatesMatrix(props: PropsType): Array<Array<Date>> {
     const startTime = startOfDay(props.startDate)
     const dates: Array<Array<Date>> = []
@@ -155,6 +159,27 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       }
       dates.push(currentDay)
     }
+    return dates
+  }
+  */
+
+  static computeDatesMatrix(props: PropsType): Array<Array<Date>> {
+    // const startTime = startOfDay(props.startDate)
+    const dates: Array<Array<Date>> = []
+    const minutesInChunk = Math.floor(60 / props.hourlyChunks)
+
+    props.renderingDates.forEach(renderingDate => {
+      const currentDay = []
+      const currentDate = startOfDay(renderingDate)
+
+      for (let h = props.minTime; h < props.maxTime; h += 1) {
+        for (let c = 0; c < props.hourlyChunks; c += 1) {
+          currentDay.push(addMinutes(addHours(currentDate, h), c * minutesInChunk))
+        }
+      }
+      dates.push(currentDay)
+    })
+
     return dates
   }
 
