@@ -72,6 +72,7 @@ const App = () => {
   const [hourlyChunks, setHourlyChunks] = React.useState<number>(2)
   const [minTime, setMinTime] = React.useState<number>(12)
   const [maxTime, setMaxTime] = React.useState<number>(17)
+  const renderingDates = [new Date('2024-01-25'), new Date('2024-01-27')]
 
   return (
     <MainDiv>
@@ -158,7 +159,8 @@ const App = () => {
           minTime={minTime}
           maxTime={maxTime}
           numDays={numDays}
-          startDate={new Date(startDate)}
+          // startDate={new Date(startDate)}
+          renderingDates={renderingDates}
           selection={schedule}
           onChange={setSchedule}
           hourlyChunks={hourlyChunks}

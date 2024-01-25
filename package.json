@@ -47,6 +47,7 @@
     "@types/jest": "^26.0.15",
     "@types/react-dom": "^18.0.11",
     "date-fns": "^1.29.0",
+    "deasync": "^0.1.29",
     "src": "^1.1.2"
   },
   "devDependencies": {

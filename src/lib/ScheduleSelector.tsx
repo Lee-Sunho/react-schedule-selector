@@ -179,7 +179,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       }
       dates.push(currentDay)
     })
-
+    console.log(dates)
     return dates
   }
 
