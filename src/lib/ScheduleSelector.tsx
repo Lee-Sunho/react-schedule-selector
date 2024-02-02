@@ -172,8 +172,9 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       const currentDay = []
       const currentDate = startOfDay(renderingDate)
 
-      for (let h = props.minTime; h < props.maxTime; h += 1) {
-        for (let c = 0; c < props.hourlyChunks; c += 1) {
+      for (let h = props.minTime; h <= props.maxTime; h += 1) {
+        // 시간이 maxTime이고 청크가 hourlyChunks보다 작을 때만 반복하여 maxTime이 포함되게 (이선호 추가)
+        for (let c = 0; c < props.hourlyChunks && !(h === props.maxTime && c === props.hourlyChunks - 1); c += 1) {
           currentDay.push(addMinutes(addHours(currentDate, h), c * minutesInChunk))
         }
       }
@@ -402,7 +403,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     const flattenedDates: Date[] = []
     const numDays = this.state.dates.length
     const numTimes = this.state.dates[0].length
-    for (let j = 0; j < numTimes; j += 1) {
+    for (let j = 0; j < numTimes - 1; j += 1) { // numTimes - 1을 통해 마지막 시간은 셀 생성하지 않게 (이선호 추가)
       for (let i = 0; i < numDays; i += 1) {
         flattenedDates.push(this.state.dates[i][j])
       }
