@@ -6,6 +6,7 @@ declare type PropsType = {
     selectionScheme: SelectionSchemeType;
     onChange: (newSelection: Array<Date>) => void;
     renderingDates: Date[];
+    blockedTimes: Date[];
     numDays: number;
     minTime: number;
     maxTime: number;
@@ -17,6 +18,7 @@ declare type PropsType = {
     unselectedColor: string;
     selectedColor: string;
     hoveredColor: string;
+    blockedColor: string;
     renderDateCell?: (datetime: Date, selected: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element;
     renderTimeLabel?: (time: Date) => JSX.Element;
     renderDateLabel?: (date: Date) => JSX.Element;
