@@ -72,7 +72,9 @@ const App = () => {
   const [hourlyChunks, setHourlyChunks] = React.useState<number>(2)
   const [minTime, setMinTime] = React.useState<number>(12)
   const [maxTime, setMaxTime] = React.useState<number>(17)
-  const renderingDates = [new Date('2024-01-25'), new Date('2024-01-27')]
+  const renderingDates = [new Date('2024-02-06'), new Date('2024-02-08')]
+  const blockedTimes = [new Date('2024-02-06T10:00:00'), new Date('2024-02-06T13:00:00')];
+
 
   return (
     <MainDiv>
@@ -166,6 +168,7 @@ const App = () => {
           hourlyChunks={hourlyChunks}
           timeFormat="h:mma"
           selectionScheme={selectionScheme}
+          blockedTimes={blockedTimes}
         />
       </ScheduleSelectorCard>
       <Links>

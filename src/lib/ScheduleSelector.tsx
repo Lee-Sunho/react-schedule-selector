@@ -104,7 +104,7 @@ type PropsType = {
   hoveredColor: string
   blockedTimes: Date[] // 이선호 추가
   blockedColor: string
-  renderDateCell?: (datetime: Date, selected: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element
+  renderDateCell?: (datetime: Date, selected: boolean, blocked: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
   renderDateLabel?: (date: Date) => JSX.Element
 }
@@ -400,7 +400,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       }
     }
     if (this.props.renderDateCell) {
-      return this.props.renderDateCell(time, selected, refSetter)
+      return this.props.renderDateCell(time, selected, blocked, refSetter)
     } else {
       return (
         <DateCell

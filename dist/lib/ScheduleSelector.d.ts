@@ -19,7 +19,7 @@ declare type PropsType = {
     selectedColor: string;
     hoveredColor: string;
     blockedColor: string;
-    renderDateCell?: (datetime: Date, selected: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element;
+    renderDateCell?: (datetime: Date, selected: boolean, blocked: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element;
     renderTimeLabel?: (time: Date) => JSX.Element;
     renderDateLabel?: (date: Date) => JSX.Element;
 };
@@ -52,7 +52,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     handleTouchMoveEvent(event: React.TouchEvent): void;
     handleTouchEndEvent(): void;
     renderDateCellWrapper: (time: Date) => JSX.Element;
-    renderDateCell: (time: Date, selected: boolean) => JSX.Element;
+    renderDateCell: (time: Date, selected: boolean, blocked: boolean) => JSX.Element;
     renderTimeLabel: (time: Date) => JSX.Element;
     renderDateLabel: (date: Date) => JSX.Element;
     renderFullDateGrid(): Array<JSX.Element>;
