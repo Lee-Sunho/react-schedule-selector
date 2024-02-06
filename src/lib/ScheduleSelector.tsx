@@ -34,19 +34,38 @@ export const GridCell = styled.div`
   touch-action: none;
 `
 
-const DateCell = styled.div<{
+type DateCellProps = {
+  blocked: boolean
   selected: boolean
   selectedColor: string
   unselectedColor: string
+  blockedColor: string
   hoveredColor: string
-}>`
+}
+
+const getDateCellColor = (props: DateCellProps) => {
+  if (props.blocked) {
+    return props.blockedColor
+  } else if (props.selected) {
+    return props.selectedColor
+  } else {
+    return props.unselectedColor
+  }
+}
+
+const DateCell = styled.div<DateCellProps>`
   width: 100%;
   height: 25px;
-  background-color: ${props => (props.selected ? props.selectedColor : props.unselectedColor)};
+  background-color: ${getDateCellColor};
 
-  &:hover {
-    background-color: ${props => props.hoveredColor};
-  }
+  ${props =>
+    !props.blocked
+      ? `
+    &:hover {
+      background-color: ${props.hoveredColor};
+    }
+  `
+      : ''}
 `
 
 const DateLabel = styled(Subtitle)`
@@ -83,6 +102,8 @@ type PropsType = {
   unselectedColor: string
   selectedColor: string
   hoveredColor: string
+  blockedTimes: Date[] // 이선호 추가
+  blockedColor: string
   renderDateCell?: (datetime: Date, selected: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
   renderDateLabel?: (date: Date) => JSX.Element
@@ -131,6 +152,8 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     selectedColor: colors.blue,
     unselectedColor: colors.paleBlue,
     hoveredColor: colors.lightBlue,
+    blockedTimes: [], // 이선호 추가
+    blockedColor: '#f1f1f2', // 이선호 추가
     onChange: () => {}
   }
 
@@ -270,7 +293,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
         selectionStart,
         selectionEnd,
         this.state.dates
-      )
+      ).filter(selectedTime => !this.isTimeBlocked(selectedTime))
     }
 
     let nextDraft = [...this.props.selection]
@@ -281,6 +304,10 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     }
 
     this.setState({ selectionDraft: nextDraft }, callback)
+  }
+
+  isTimeBlocked(time: Date) {
+    return this.props.blockedTimes.find(blockedTime => blockedTime.toISOString() === time.toISOString()) !== undefined
   }
 
   // Isomorphic (mouse and touch) handler since starting a selection works the same way for both classes of user input
@@ -334,34 +361,39 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     }
 
     const selected = Boolean(this.state.selectionDraft.find(a => isSameMinute(a, time)))
+    const blocked = this.isTimeBlocked(time)
+
+    const unblockedCellProps = {
+      // Mouse handlers
+      onMouseDown: startHandler,
+      onMouseEnter: () => {
+        this.handleMouseEnterEvent(time)
+      },
+      onMouseUp: () => {
+        this.handleMouseUpEvent(time)
+      },
+      // Touch handlers
+      // Since touch events fire on the event where the touch-drag started, there's no point in passing
+      // in the time parameter, instead these handlers will do their job using the default Event
+      // parameters
+      onTouchStart: startHandler,
+      onTouchMove: this.handleTouchMoveEvent,
+      onTouchEnd: this.handleTouchEndEvent
+    }
 
     return (
       <GridCell
         className="rgdp__grid-cell"
         role="presentation"
         key={time.toISOString()}
-        // Mouse handlers
-        onMouseDown={startHandler}
-        onMouseEnter={() => {
-          this.handleMouseEnterEvent(time)
-        }}
-        onMouseUp={() => {
-          this.handleMouseUpEvent(time)
-        }}
-        // Touch handlers
-        // Since touch events fire on the event where the touch-drag started, there's no point in passing
-        // in the time parameter, instead these handlers will do their job using the default Event
-        // parameters
-        onTouchStart={startHandler}
-        onTouchMove={this.handleTouchMoveEvent}
-        onTouchEnd={this.handleTouchEndEvent}
+        {...(!blocked ? unblockedCellProps : {})}
       >
-        {this.renderDateCell(time, selected)}
+        {this.renderDateCell(time, selected, blocked)}
       </GridCell>
     )
   }
 
-  renderDateCell = (time: Date, selected: boolean): JSX.Element => {
+  renderDateCell = (time: Date, selected: boolean, blocked: boolean): JSX.Element => {
     const refSetter = (dateCell: HTMLElement | null) => {
       if (dateCell) {
         this.cellToDate.set(dateCell, time)
@@ -372,11 +404,13 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     } else {
       return (
         <DateCell
+          blocked={blocked}
           selected={selected}
           ref={refSetter}
           selectedColor={this.props.selectedColor}
           unselectedColor={this.props.unselectedColor}
           hoveredColor={this.props.hoveredColor}
+          blockedColor={this.props.blockedColor}
         />
       )
     }
