@@ -102,9 +102,14 @@ type PropsType = {
   unselectedColor: string
   selectedColor: string
   hoveredColor: string
-  blockedTimes: Date[] // 이선호 추가
+  availableTimes: Date[] // 이선호 추가
   blockedColor: string
-  renderDateCell?: (datetime: Date, selected: boolean, blocked: boolean, refSetter: (dateCellElement: HTMLElement) => void) => JSX.Element
+  renderDateCell?: (
+    datetime: Date,
+    selected: boolean,
+    blocked: boolean,
+    refSetter: (dateCellElement: HTMLElement) => void
+  ) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
   renderDateLabel?: (date: Date) => JSX.Element
 }
@@ -152,7 +157,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     selectedColor: colors.blue,
     unselectedColor: colors.paleBlue,
     hoveredColor: colors.lightBlue,
-    blockedTimes: [], // 이선호 추가
+    availableTimes: [], // 이선호 추가
     blockedColor: '#f1f1f2', // 이선호 추가
     onChange: () => {}
   }
@@ -307,7 +312,9 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   }
 
   isTimeBlocked(time: Date) {
-    return this.props.blockedTimes.find(blockedTime => blockedTime.toISOString() === time.toISOString()) !== undefined
+    return (
+      this.props.availableTimes.find(availableTime => availableTime.toISOString() === time.toISOString()) === undefined
+    )
   }
 
   // Isomorphic (mouse and touch) handler since starting a selection works the same way for both classes of user input
@@ -436,7 +443,8 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     const flattenedDates: Date[] = []
     const numDays = this.state.dates.length
     const numTimes = this.state.dates[0].length
-    for (let j = 0; j < numTimes - 1; j += 1) { // numTimes - 1을 통해 마지막 시간은 셀 생성하지 않게 (이선호 추가)
+    for (let j = 0; j < numTimes - 1; j += 1) {
+      // numTimes - 1을 통해 마지막 시간은 셀 생성하지 않게 (이선호 추가)
       for (let i = 0; i < numDays; i += 1) {
         flattenedDates.push(this.state.dates[i][j])
       }
