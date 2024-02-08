@@ -157,7 +157,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     selectedColor: colors.blue,
     unselectedColor: colors.paleBlue,
     hoveredColor: colors.lightBlue,
-    availableTimes: [], // 이선호 추가
+    // availableTimes: [], // 이선호 추가
     blockedColor: '#f1f1f2', // 이선호 추가
     onChange: () => {}
   }
@@ -312,9 +312,13 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   }
 
   isTimeBlocked(time: Date) {
-    return (
-      this.props.availableTimes.find(availableTime => availableTime.toISOString() === time.toISOString()) === undefined
-    )
+    if (this.props.availableTimes) {
+      return (
+        this.props.availableTimes.find(availableTime => availableTime.toISOString() === time.toISOString()) ===
+        undefined
+      )
+    }
+    return false
   }
 
   // Isomorphic (mouse and touch) handler since starting a selection works the same way for both classes of user input
