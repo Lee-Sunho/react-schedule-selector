@@ -25,6 +25,7 @@ declare type PropsType = {
     selected: boolean,
     blocked: boolean,
     clicked: boolean,
+    onClick: (time: Date, blocked: boolean) => void,
     refSetter: (dateCellElement: HTMLElement) => void
   ) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
