@@ -64,6 +64,12 @@ const ExternalLink = styled.a`
   margin: 5px;
 `
 
+export const DateCell = styled.div<{ selected: boolean; blocked: boolean; clicked: boolean }>`
+  height: 18px;
+  border: 1px dashed gray;
+  background-color: ${props => (props.blocked ? '#dddddd' : props.selected ? 'red' : 'white')};
+`
+
 const App = () => {
   const [schedule, setSchedule] = React.useState<Array<Date>>([new Date('2024-02-06T10:00:00')])
   const [selectionScheme, setSelectionScheme] = React.useState<SelectionSchemeType>('linear')
@@ -74,6 +80,23 @@ const App = () => {
   const [maxTime, setMaxTime] = React.useState<number>(17)
   const renderingDates = [new Date('2024-02-06'), new Date('2024-02-08')]
   const availableTimes = [new Date('2024-02-06T10:00:00'), new Date('2024-02-06T13:00:00')]
+
+  const renderCustomDateCell = (
+    date: Date,
+    selected: boolean,
+    blocked: boolean,
+    clicked: boolean,
+    onClick: (time: Date, blocked: boolean) => void
+  ) => {
+    return (
+      <DateCell
+        selected={selected}
+        blocked={blocked}
+        clicked={clicked}
+        onClick={() => onClick(date, blocked)}
+      ></DateCell>
+    )
+  }
 
   return (
     <MainDiv>
@@ -169,6 +192,7 @@ const App = () => {
           selectionScheme={selectionScheme}
           availableTimes={availableTimes}
           isConfirmed={true}
+          renderDateCell={renderCustomDateCell}
         />
       </ScheduleSelectorCard>
       <Links>

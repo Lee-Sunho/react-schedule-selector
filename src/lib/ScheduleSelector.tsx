@@ -111,6 +111,7 @@ type PropsType = {
     selected: boolean,
     blocked: boolean,
     clicked: boolean,
+    onClick: (time: Date, blocked: boolean) => void,
     refSetter: (dateCellElement: HTMLElement) => void
   ) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
@@ -431,7 +432,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       }
     }
     if (this.props.renderDateCell) {
-      return this.props.renderDateCell(time, selected, blocked, clicked, refSetter)
+      return this.props.renderDateCell(time, selected, blocked, clicked, this.handleCellClick, refSetter)
     } else {
       return (
         <DateCell
