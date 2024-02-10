@@ -19,10 +19,12 @@ declare type PropsType = {
   selectedColor: string
   hoveredColor: string
   blockedColor: string
+  isConfirmed: boolean
   renderDateCell?: (
     datetime: Date,
     selected: boolean,
     blocked: boolean,
+    clicked: boolean,
     refSetter: (dateCellElement: HTMLElement) => void
   ) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
@@ -34,6 +36,7 @@ declare type StateType = {
   selectionStart: Date | null
   isTouchDragging: boolean
   dates: Array<Array<Date>>
+  clickedTime: Date | null
 }
 export declare const preventScroll: (e: TouchEvent) => void
 export default class ScheduleSelector extends React.Component<PropsType, StateType> {
@@ -57,7 +60,8 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   handleTouchMoveEvent(event: React.TouchEvent): void
   handleTouchEndEvent(): void
   renderDateCellWrapper: (time: Date) => JSX.Element
-  renderDateCell: (time: Date, selected: boolean, blocked: boolean) => JSX.Element
+  handleCellClick: (time: Date, blocked: boolean) => void
+  renderDateCell: (time: Date, selected: boolean, blocked: boolean, clicked: boolean) => JSX.Element
   renderTimeLabel: (time: Date) => JSX.Element
   renderDateLabel: (date: Date) => JSX.Element
   renderFullDateGrid(): Array<JSX.Element>

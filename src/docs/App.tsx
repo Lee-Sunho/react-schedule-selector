@@ -65,7 +65,7 @@ const ExternalLink = styled.a`
 `
 
 const App = () => {
-  const [schedule, setSchedule] = React.useState<Array<Date>>([])
+  const [schedule, setSchedule] = React.useState<Array<Date>>([new Date('2024-02-06T10:00:00')])
   const [selectionScheme, setSelectionScheme] = React.useState<SelectionSchemeType>('linear')
   const [startDate, setStartDate] = React.useState<Date>(new Date())
   const [numDays, setNumDays] = React.useState<number>(7)
@@ -168,6 +168,7 @@ const App = () => {
           timeFormat="h:mma"
           selectionScheme={selectionScheme}
           availableTimes={availableTimes}
+          isConfirmed={true}
         />
       </ScheduleSelectorCard>
       <Links>

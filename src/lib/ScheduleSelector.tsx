@@ -35,6 +35,7 @@ export const GridCell = styled.div`
 `
 
 type DateCellProps = {
+  clicked: boolean
   blocked: boolean
   selected: boolean
   selectedColor: string
@@ -103,11 +104,13 @@ type PropsType = {
   selectedColor: string
   hoveredColor: string
   availableTimes: Date[] // 이선호 추가
-  blockedColor: string
+  blockedColor: string // 이선호 추가
+  isConfirmed: boolean // 이선호 추가
   renderDateCell?: (
     datetime: Date,
     selected: boolean,
     blocked: boolean,
+    clicked: boolean,
     refSetter: (dateCellElement: HTMLElement) => void
   ) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
@@ -122,6 +125,7 @@ type StateType = {
   selectionStart: Date | null
   isTouchDragging: boolean
   dates: Array<Array<Date>>
+  clickedTime: Date | null // 이선호 추가
 }
 
 export const preventScroll = (e: TouchEvent) => {
@@ -159,6 +163,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     hoveredColor: colors.lightBlue,
     // availableTimes: [], // 이선호 추가
     blockedColor: '#f1f1f2', // 이선호 추가
+    isConfirmed: false, // 이선호 추가
     onChange: () => {}
   }
 
@@ -219,7 +224,8 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       selectionType: null,
       selectionStart: null,
       isTouchDragging: false,
-      dates: ScheduleSelector.computeDatesMatrix(props)
+      dates: ScheduleSelector.computeDatesMatrix(props),
+      clickedTime: null // 이선호 추가
     }
 
     this.selectionSchemeHandlers = {
@@ -325,9 +331,14 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   handleSelectionStartEvent(startTime: Date) {
     // Check if the startTime cell is selected/unselected to determine if this drag-select should
     // add values or remove values
-    const timeSelected = this.props.selection.find(a => isSameMinute(a, startTime))
+    // 면접 확정뷰의 경우 이미 선택된 날짜 선택 불가하도록 - 이선호 추가
+    const isAlreadySelected = this.state.selectionDraft.find(a => isSameMinute(a, startTime))
+    const selectionType = isAlreadySelected ? 'remove' : 'add'
+    if (this.props.isConfirmed && isAlreadySelected) {
+      return
+    }
     this.setState({
-      selectionType: timeSelected ? 'remove' : 'add',
+      selectionType: selectionType ? 'remove' : 'add',
       selectionStart: startTime
     })
   }
@@ -367,12 +378,14 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   }
 
   renderDateCellWrapper = (time: Date): JSX.Element => {
+    const { clickedTime } = this.state
     const startHandler = () => {
       this.handleSelectionStartEvent(time)
     }
 
     const selected = Boolean(this.state.selectionDraft.find(a => isSameMinute(a, time)))
     const blocked = this.isTimeBlocked(time)
+    const clicked = clickedTime !== null && this.props.isConfirmed && isSameMinute(time, clickedTime)
 
     const unblockedCellProps = {
       // Mouse handlers
@@ -399,22 +412,30 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
         key={time.toISOString()}
         {...(!blocked ? unblockedCellProps : {})}
       >
-        {this.renderDateCell(time, selected, blocked)}
+        {this.renderDateCell(time, selected, blocked, clicked)}
       </GridCell>
     )
   }
 
-  renderDateCell = (time: Date, selected: boolean, blocked: boolean): JSX.Element => {
+  // 이선호 추가
+  handleCellClick = (time: Date, blocked: boolean) => {
+    if (!blocked) {
+      this.setState({ clickedTime: time })
+    }
+  }
+
+  renderDateCell = (time: Date, selected: boolean, blocked: boolean, clicked: boolean): JSX.Element => {
     const refSetter = (dateCell: HTMLElement | null) => {
       if (dateCell) {
         this.cellToDate.set(dateCell, time)
       }
     }
     if (this.props.renderDateCell) {
-      return this.props.renderDateCell(time, selected, blocked, refSetter)
+      return this.props.renderDateCell(time, selected, blocked, clicked, refSetter)
     } else {
       return (
         <DateCell
+          clicked={clicked}
           blocked={blocked}
           selected={selected}
           ref={refSetter}
@@ -422,6 +443,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
           unselectedColor={this.props.unselectedColor}
           hoveredColor={this.props.hoveredColor}
           blockedColor={this.props.blockedColor}
+          onClick={() => this.handleCellClick(time, blocked)}
         />
       )
     }
