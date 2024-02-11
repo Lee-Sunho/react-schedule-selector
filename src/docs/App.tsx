@@ -107,7 +107,7 @@ const App = () => {
         selected={selected}
         blocked={blocked}
         clicked={clicked}
-        onClick={() => handleClick(date, blocked)}
+        // onClick={() => handleClick(date, blocked)}
       ></DateCell>
     )
   }
@@ -204,11 +204,10 @@ const App = () => {
           hourlyChunks={hourlyChunks}
           timeFormat="h:mma"
           selectionScheme={selectionScheme}
-          availableTimes={availableTimes}
-          isConfirmed={true}
-          renderDateCell={renderCustomDateCell}
-          onClick={setClickedTime}
-          clickedTime={clickeTime}
+          // availableTimes={availableTimes}
+          // isConfirmed={true}
+          // renderDateCell={renderCustomDateCell}
+          // clickedTime={clickeTime}
         />
       </ScheduleSelectorCard>
       <Links>
