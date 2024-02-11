@@ -322,7 +322,6 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   }
 
   isTimeBlocked(time: Date) {
-    console.log(this.props.availableTimes)
     if (this.props.availableTimes) {
       return (
         this.props.availableTimes.find(availableTime => availableTime.toISOString() === time.toISOString()) ===
