@@ -47,6 +47,8 @@ type DateCellProps = {
 const getDateCellColor = (props: DateCellProps) => {
   if (props.blocked) {
     return props.blockedColor
+  } else if (props.clicked) {
+    return '#000000'
   } else if (props.selected) {
     return props.selectedColor
   } else {
@@ -106,12 +108,13 @@ type PropsType = {
   availableTimes: Date[] // 이선호 추가
   blockedColor: string // 이선호 추가
   isConfirmed: boolean // 이선호 추가
+  clickedTime: Date | null // 이선호 추가
   renderDateCell?: (
     datetime: Date,
     selected: boolean,
     blocked: boolean,
     clicked: boolean,
-    onClick: (time: Date, blocked: boolean) => void,
+    // onClick: (time: Date, blocked: boolean) => void,
     refSetter: (dateCellElement: HTMLElement) => void
   ) => JSX.Element
   renderTimeLabel?: (time: Date) => JSX.Element
@@ -126,7 +129,7 @@ type StateType = {
   selectionStart: Date | null
   isTouchDragging: boolean
   dates: Array<Array<Date>>
-  clickedTime: Date | null // 이선호 추가
+  // clickedTime: Date | null // 이선호 추가
 }
 
 export const preventScroll = (e: TouchEvent) => {
@@ -165,6 +168,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     // availableTimes: [], // 이선호 추가
     blockedColor: '#f1f1f2', // 이선호 추가
     isConfirmed: false, // 이선호 추가
+    clickedTime: null,
     onChange: () => {}
   }
 
@@ -225,8 +229,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       selectionType: null,
       selectionStart: null,
       isTouchDragging: false,
-      dates: ScheduleSelector.computeDatesMatrix(props),
-      clickedTime: null // 이선호 추가
+      dates: ScheduleSelector.computeDatesMatrix(props)
     }
 
     this.selectionSchemeHandlers = {
@@ -379,14 +382,14 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
   }
 
   renderDateCellWrapper = (time: Date): JSX.Element => {
-    const { clickedTime } = this.state
     const startHandler = () => {
       this.handleSelectionStartEvent(time)
     }
 
     const selected = Boolean(this.state.selectionDraft.find(a => isSameMinute(a, time)))
     const blocked = this.isTimeBlocked(time)
-    const clicked = clickedTime !== null && this.props.isConfirmed && isSameMinute(time, clickedTime)
+    const clicked =
+      this.props.clickedTime !== null && this.props.isConfirmed && isSameMinute(time, this.props.clickedTime)
 
     const unblockedCellProps = {
       // Mouse handlers
@@ -418,13 +421,6 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
     )
   }
 
-  // 이선호 추가
-  handleCellClick = (time: Date, blocked: boolean) => {
-    if (!blocked) {
-      this.setState({ clickedTime: time })
-    }
-  }
-
   renderDateCell = (time: Date, selected: boolean, blocked: boolean, clicked: boolean): JSX.Element => {
     const refSetter = (dateCell: HTMLElement | null) => {
       if (dateCell) {
@@ -432,7 +428,7 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
       }
     }
     if (this.props.renderDateCell) {
-      return this.props.renderDateCell(time, selected, blocked, clicked, this.handleCellClick, refSetter)
+      return this.props.renderDateCell(time, selected, blocked, clicked, refSetter)
     } else {
       return (
         <DateCell
@@ -444,7 +440,6 @@ export default class ScheduleSelector extends React.Component<PropsType, StateTy
           unselectedColor={this.props.unselectedColor}
           hoveredColor={this.props.hoveredColor}
           blockedColor={this.props.blockedColor}
-          onClick={() => this.handleCellClick(time, blocked)}
         />
       )
     }
